@@ -30,4 +30,4 @@ def create_signature(timestamp: str):
 
 if __init__ == "__main__":
   message = create_signature(timestamp)
-  print('Signed message:' message)
+  print('Signed message:', message)
