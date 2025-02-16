@@ -1,33 +1,53 @@
 # pip install py-sr25519-bindings
 # pip install py-bip39-bindings
 # pip install mnemonic
+# pip install scalecodec
 
 import bip39
 import sr25519
 import mnemonic
+import scalecodec
 from hashlib import blake2b
 from wordlist import words
 
 
-# visitorId is given from fpjs
-# found at: async createAccount(e){ or find it by ="sr25519"
-# breakpoint n = await N() and the value of n is visitorId
-visitorId = '654876d6cbb05449270e38d11bb1f9a6'
+class Polka:
+    def __init__(self, visitor_id: str):
+        self.visitor_id = visitor_id
+        self.blake_digest = None
+        self.mini_secret = None
+        self.keypair = None
+        self.pubkey = None
+        self.mnemonic = mnemonic.Mnemonic(language="english", wordlist=words)
 
-# received from the challenge
-# ../provider/client/captcha/pow
-timestamp = '1739428755367'
+    def create_account(self):
+        blake = blake2b(self.visitor_id.encode(), digest_size=16, key=bytes())
+        self.blake_digest = blake.hexdigest().encode()
 
-blakeHash = blake2b(visitorId.encode(), digest_size=16, key=bytes())
-mnemo = mnemonic.Mnemonic(language="english", wordlist=words)
-seed_phrase = mnemo.to_mnemonic(blakeHash.hexdigest().encode())
-mini_secret = bip39.bip39_to_mini_secret(seed_phrase, "")
-keypair = sr25519.pair_from_seed(mini_secret)
+    def seed_phrase(self):
+        seed = self.mnemonic.to_mnemonic(self.blake_digest)
+        self.mini_secret = bip39.bip39_to_mini_secret(seed, "")
 
-def create_signature(timestamp: str):
-    signature = sr25519.sign(keypair, timestamp.encode())
-    return signature.hex()
+    def create_keypair(self):
+        self.keypair = sr25519.pair_from_seed(self.mini_secret)
+        self.pubkey = self.keypair[0].hex()
 
-if __init__ == "__main__":
-  message = create_signature(timestamp)
-  print('Signed message:', message)
+    def address(self):
+        return scalecodec.ss58_encode(self.pubkey)
+
+    # received from the challenge
+    # ../provider/client/captcha/pow
+    def sign(self, timestamp: str):
+        signature = sr25519.sign(self.keypair, timestamp.encode())
+        return signature.hex()
+
+
+if __name__ == "__main__":
+    # visitorId is given from fpjs
+    # found at: async createAccount(e){ or find it by ="sr25519"
+    # breakpoint n = await N() and the value of n is visitorId
+    polkadance = Polka('654876d6cbb05449270e38d11bb1f9a6')
+    polkadance.create_account()
+    polkadance.seed_phrase()
+    polkadance.create_keypair()
+    print(f'You (ss58) address: {polkadance.address()}')
