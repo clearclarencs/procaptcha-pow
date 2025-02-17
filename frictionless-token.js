@@ -1,5 +1,4 @@
-// reversing how to generate ("token") key for /frictionless endpoint
-
+// reversing this token shit
 
 const V = [
     "`9RY+%_J~]&2F",
@@ -234,6 +233,7 @@ const V = [
     "TQD75x"
 ]
 
+// reversing how to generate ("token") key for /frictionless endpoint
 // const e = await Jx();
 
 function l(x, y, a) {
@@ -298,10 +298,6 @@ function N(e, a) {
     return Object.defineProperty(e, c(-92), { value: a, configurable: !0 }), e;
 }
 
-function x(e) {
-    return V[e > 212 ? e + 10 : e + 18];
-}
-
 
 const Ax = N((...e) => {
     e.length = 1
@@ -310,27 +306,38 @@ const Ax = N((...e) => {
 
 
     e[2] = l((Number(("" + e[1]).slice(l(3, 0, 24))) + e[0]) / (e[66] + 1125) * Math.PI, Math.PI / 2, -28);
-    e[3] = l(Math.sin(e[2]), 1000, /*R(63)*/63);
+    e[3] = l(Math.sin(e[2]), 1000, 63);
     return e[66] > -7 ? e[115] : [e[1], e[3]]
 });
 
-async function p0(...e) {
-    e.length = 1, e['k4a39xw'] = 35, e.Jlk88Q = atob(`MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoa1QCkVvFAfv+fgFpjfq
+async function encryptPlainText(...e) {
+    const publicKeyBytes = atob(`MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoa1QCkVvFAfv+fgFpjfq
   9/YrtGzDYull6V0oiy1XPuTCQeb4uptHEmCepnZPmKaP/akp5wS7UTGYw+or//gd
   IER2Cs58q7tVvqxTe68mx901oSw61VOt7mqDVhIsnJlH6yo2Kd9a5rClU/xr618K
   Ry0wuoD2i6mq4fE3uKZZBNrxJ57Jg0EXEsMIvYHxk0kKO8i0YIxEVP84tUuZiq9T
   dcponzr4ny6lqn0YlOSu67kRVL8O0ryHvRJomNN4OcUgq/rUfzJxonqvvmHd75n4
   4r8n4Y7I8/DmVe9cpDWDgv6vk2djRkAQDiLfDEMfq8C7S+/8RPyLTCxXUrR2ouUG
-  6QIDAQAB`), e[e['k4a39xw'] - 33] = new (Uint8Array)(e['Jlk88Q'].length), e.k4a39xw = 106;
-    for (let a = 0; a < e['Jlk88Q']['length'] && 'SLeUkpi'['charCodeAt'](3) == 85; a++)
-        e[2][a] = e.Jlk88Q['charCodeAt'](a);
-    return e[172] = e.vQbLLs, e[172] = await crypto['subtle']['importKey']('spki', e[2], {
-        ['name']: 'RSA-OA' + "EP",
-        ['hash']: 'SHA-256'
-    }, l(e['k4a39xw'] - 106, 0, -43), ['encrypt']), e.OtdVLwD = new (TextEncoder)(), e[6] = await crypto.subtle.encrypt({ name: "RSA-OAEP" },
-        e[172], e.OtdVLwD.encode(e[e['k4a39xw'] - 106])), e['k4a39xw'] > 147 ? e[e.k4a39xw + 84] : btoa(String['fromCharCode']['apply'](null, new (Uint8Array)(e[6])));
+  6QIDAQAB`);
+
+    const publicKey = new Uint8Array(294);
+
+    for (let a = 0; a < 294; a++)
+        publicKey[a] = publicKeyBytes.charCodeAt(a);
+
+    const cryptoKey = await crypto.subtle.importKey('spki', publicKey, {
+        'name': 'RSA-OAEP',
+        'hash': 'SHA-256'
+    }, true, ['encrypt']);
+
+    const cryptoText = await crypto.subtle.encrypt(
+        { name: "RSA-OAEP" },
+        cryptoKey,
+        new TextEncoder().encode(e[0])
+    );
+
+    return btoa(String.fromCharCode(...new Uint8Array(cryptoText)));
 }
 
-const token = (await p0(JSON.stringify(Ax(c))))
+const token = await encryptPlainText(JSON.stringify(Ax(c)));
 // console.log(Ax(c));
 console.log(token)
