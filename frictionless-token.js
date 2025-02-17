@@ -1,9 +1,10 @@
-// reversing how to generate ("token") key for /frictionless endpoint
-const Ax = (...e) => {
-    const currTime = Date.now().toString().slice(-3);
-    const pie = ((Number(currTime) + e[0]) / (999) * Math.PI) - Math.PI / 2
-    const sinner = Math.sin(pie) * 1000;
-    return [currTime, sinner]
+// reversing how to generate ("token") key for /frictionless endpoint\
+const Ax = (a) => {
+    const currTime = Date.now();
+    let pie = Number(currTime.toString().slice(-3)) + a;
+    pie /= 999 * Math.PI;
+    pie -= Math.PI / 2
+    return [currTime, Math.sin(pie) * 1000]
 };
 
 async function encryptPlainText(...e) {
