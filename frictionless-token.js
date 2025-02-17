@@ -1,25 +1,14 @@
 // reversing how to generate ("token") key for /frictionless endpoint
 
 function l(x, y, a) {
-    if (a === 63)
-        return x * y;
-    if (a === -44)
-        return x + y;
-    if (a === -28)
-        return x - y;
-    if (a == 24)
-        return -x;
-    if (a == -43)
-        return !x;
-    if (a == -44)
-        return x + y;
-    if (a == 61)
-        return void a;
-    if (a == 68)
-        return typeof a;
-    if (a == -28)
-        return a - b
-
+    switch (a) {
+        case -44:
+            return x + y;
+        case -28:
+            return x - y;
+        case 63:
+            return x * y;
+    }
 }
 
 const a = l(Math.random(), 0.3, 63);
