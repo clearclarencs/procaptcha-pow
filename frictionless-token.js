@@ -1,23 +1,8 @@
 // reversing how to generate ("token") key for /frictionless endpoint
-
-function l(x, y, a) {
-    switch (a) {
-        case -44:
-            return x + y;
-        case -28:
-            return x - y;
-        case 63:
-            return x * y;
-    }
-}
-
-const a = l(Math.random(), 0.3, 63);
-const c = Math.min(l(0, a, -44), 1);
-
 const Ax = (...e) => {
     const currTime = Date.now();
-    const pie = l((Number(currTime.toString().slice(-3)) + e[0]) / (999) * Math.PI, Math.PI / 2, -28);
-    const sinner = l(Math.sin(pie), 1000, 63);
+    const pie = ((Number(currTime.toString().slice(-3)) + e[0]) / (999) * Math.PI) - Math.PI / 2
+    const sinner = Math.sin(pie) * 1000;
     return [currTime, sinner]
 };
 
@@ -49,5 +34,9 @@ async function encryptPlainText(...e) {
     return btoa(String.fromCharCode(...new Uint8Array(cryptoText)));
 }
 
-const token = await encryptPlainText(JSON.stringify(Ax(c)));
+const token = await encryptPlainText(
+    JSON.stringify(
+        Ax(Math.min(Math.random() * 0.3, 1))
+    )
+);
 console.log(token)
