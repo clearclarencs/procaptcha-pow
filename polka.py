@@ -46,7 +46,7 @@ if __name__ == "__main__":
     # visitorId is given from fpjs
     # found at: async createAccount(e){ or find it by ="sr25519"
     # breakpoint n = await N() and the value of n is visitorId
-    polkadance = Polka('654876d6cbb05449270e38d11bb1f9a6')
+    polkadance = Polka('visitor id')
     polkadance.create_account()
     polkadance.seed_phrase()
     polkadance.create_keypair()
