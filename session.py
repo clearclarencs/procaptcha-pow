@@ -1,7 +1,8 @@
 import requests
-import polka
+from polka import Polka
 from hashlib import sha256
 from gen_token import generate_token
+from gen_solution import encode_solution
 
 
 class Pow:
@@ -88,7 +89,7 @@ class Prosopo:
     def submit_challenge(self, challenge_str: str, provider: str, signature: str, nonce: int):
         response = requests.request(
             method="POST",
-            url="https://pronode9.prosopo.io/v1/prosopo/provider/client/pow/solution",
+            url=f"{self.base_url}/provider/client/pow/solution",
             headers=self.default_headers,
             json={
                 "challenge": challenge_str,
@@ -109,10 +110,26 @@ class Prosopo:
         )
 
         print(response.json())
+    
+    def create_captcha_solution(self, challenge_str: str, provider: str, signature: str, timestamp: str, nonce: int):
+
+        return encode_solution(
+            prosopo_url=f"https://{self.base_url.split('/')[2]}",
+            site_key=self.site_key,
+            user_key=self.user_key,
+            challenge_str=challenge_str,
+            provider=provider,
+            signature=signature,
+            timestamp=timestamp,
+            nonce=nonce
+        )
 
 
 def main(site_key: str, visitor_id: str):
-    signer = polka.create_signer(visitor_id)
+    signer = Polka(visitor_id)
+    signer.create_account()
+    signer.seed_phrase()
+    signer.create_keypair()
     print(f'Your (ss58) address: {signer.address()}')
 
     captcha = Prosopo(
@@ -122,13 +139,24 @@ def main(site_key: str, visitor_id: str):
     session_id = captcha.get_session_id()
     challenge = captcha.get_challenge(session_id)
     nonce = Pow.checkPrefix(challenge['challenge'], challenge['difficulty'])
+    signature = signer.sign(challenge['timestamp'])
 
     captcha.submit_challenge(
         challenge['challenge'],
         challenge['signature']['provider']['challenge'],
-        signer.sign(challenge['timestamp']),
+        signature,
         nonce
     )
+
+    solution = captcha.create_captcha_solution(
+        challenge['challenge'],
+        challenge['signature']['provider']['challenge'],
+        signature,
+        challenge['timestamp'],
+        nonce
+    )
+
+    print(solution)
 
 
 if __name__ == "__main__":
